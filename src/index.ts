@@ -1,18 +1,25 @@
-import express, {Express, Request, Response} from 'express';
 import dotenv from 'dotenv';
-import { helloController } from './contollers/hello-controller';
-import { uploadFile } from './middlewares/upload-file';
-import { error } from 'console';
-import { errorHandler } from './middlewares/error';
+import express, { Express } from 'express';
+import { routerV1 } from './routes/users/users';
+import swaggerUI from "swagger-ui-express"
+import swaggerDocument from "../swagger/swagger-output.json"
 
 dotenv.config();
 
 const app : Express = express();
+app.use(express.json());
 const port = process.env.PORT || 4000;
+app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument))
 
-app.get("/", uploadFile ,helloController )
+app.get("/", (req, res) => {
+    const {accessToken} = req.query
 
-app.use(errorHandler)
+    res.json({accessToken})
+})
+
+app.use("/api/v1", routerV1)
+
+
 
 
 app.listen(port, () => {

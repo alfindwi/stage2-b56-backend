@@ -1,15 +1,33 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 
-export function uploadFile(req: Request, res: Response, next: NextFunction) {
-    // proses mengamankan data user
+export function authentication(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const authorizationHeader = req.header("Authorization");
 
-    const secret = req.headers.authorization = "gblhtw";
+  if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      message: "Unauthorized!",
+    });
+  }
 
-    if (secret !== "gblhtw") {
-        return res.json({
-            message: "anda tidak diizinkan masuk", 
-            status: res.sendStatus(401)
-        })
-    }
+  const token = authorizationHeader.replace("Bearer ", "");
+
+  if (!token) {
+    return res.status(401).json({
+      message: "Authorization token not found!",
+    });
+  }
+
+  try {
+    const secretKey = process.env.JWT_SECRET as string;
+    const decoded = jwt.verify(token, secretKey);
+    (req as any).user = decoded;
     next();
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
 }

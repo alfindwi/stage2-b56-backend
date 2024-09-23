@@ -19,22 +19,18 @@ class userService{
         return users
     }
     
-     async getUserById(id : number) : Promise<User | null>{
-        const user = await prisma.user.findUnique({
-          where: {
-            id: id,
-        }
-        })
-
-        if(!user) {
-            throw {
-                status: 404,
-                message: "User not found!",
-                code: customErrorCode.USERS_NOT_EXIST
-            } as customError
-        }
-        return user 
-    }
+    async getUserById(id: number): Promise<User | null> {
+      try {
+          const user = await prisma.user.findUnique({
+              where: { id },
+          });
+  
+          return user; // Akan mengembalikan user atau null jika tidak ditemukan
+      } catch (error) {
+          console.error("Error in getUserById service:", error);
+          throw new Error("Failed to fetch user by ID");
+      }
+  }
     
      async getUserByEmail(email : string) : Promise<User | null>{
       const user = await prisma.user.findUnique({
@@ -110,8 +106,6 @@ class userService{
       });
   }
   
-  
-
     async deleteUser(id: number): Promise<User | null> {
         const user = await prisma.user.findUnique({
             where: {id},

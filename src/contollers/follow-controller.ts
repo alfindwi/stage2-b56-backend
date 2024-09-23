@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import userService from "../services/user-service";
 import { customError, customErrorCode } from "../types/error";
-import { createUserScehma , updateUserScehma} from "../utils/schema/create-users-schema";
+import { createUserScehma , updateUserScehma} from "../utils/schema/users-schema";
 import threadService from "../services/thread-service";
 import followService from "../services/follow-service";
 import { createFollowSchema } from "../utils/schema/create-follow-schema";

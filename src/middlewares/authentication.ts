@@ -6,6 +6,9 @@ export function authentication(
   res: Response,
   next: NextFunction
 ) {
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   const authorizationHeader = req.header("Authorization");
 
   if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {

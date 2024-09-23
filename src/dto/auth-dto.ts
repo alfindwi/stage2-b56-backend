@@ -1,8 +1,9 @@
 export type RegisterDTO = {
     fullName: string;
     email: string;
-    username: string;
     passwordUsers: string;
+    username: string;
+    imgage?: string;
 };
 
 export type LoginDTO = {

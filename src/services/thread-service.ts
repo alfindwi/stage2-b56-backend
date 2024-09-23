@@ -1,31 +1,91 @@
 import { PrismaClient, Thread } from "@prisma/client"
 import { customError, customErrorCode } from "../types/error"
-import { ThreadDTO } from "../dto/thread-dto"
+import { CreateThreadDTO, UpdateThreadDTO } from "../dto/thread-dto"
 
 const prisma = new PrismaClient()
 
 class threadService{
-     async getAllThread() : Promise<Thread[]> {
-      const threads = await prisma.thread.findMany()
+  async getAllThreads(): Promise<Thread[]> {
+    return await prisma.thread.findMany({
+      include: {
+        user: true,
+      },
+    });
+  }
 
-      if(!threads) {
+    async getThreadById(id : number) : Promise<Thread | null>{
+      const thread = await prisma.thread.findUnique({
+        where: {
+          id: id,
+      }
+      })
+
+      if(!thread) {
+          throw {
+              status: 404,
+              message: "Thread not found!",
+              code: customErrorCode.USERS_NOT_EXIST
+          } as customError
+      }
+      return thread 
+  }
+
+  async createThread(data: CreateThreadDTO): Promise<Thread | null> {
+    return await prisma.thread.create({
+      data: {
+        ...data,
+        userId: 1,
+      },
+    });
+  }
+  
+
+    async updateThread(data: UpdateThreadDTO): Promise<Thread | null> {
+      const thread = await prisma.thread.findUnique({
+        where: {
+          id: data.id,
+        },
+      });
+  
+      if (!thread) {
         throw {
           status: 404,
           message: "Thread not found!",
-          code: customErrorCode.THREAD_NOT_EXIST
-        } as customError
+          code: customErrorCode.THREAD_NOT_EXIST,
+        } as customError;
       }
-        return threads
+  
+      if (data.content) {
+        thread.content = data.content;
+      }
+  
+      if (data.image) {
+        thread.image = data.image;
+      }
+  
+      return await prisma.thread.update({
+        data: thread,
+        where: { id: 2 },
+      });
     }
 
-    async createThread(thread: ThreadDTO){
-     const threads = await prisma.thread.create({
-       data: {
-         ...thread
+    async deleteThread(id: number): Promise<Thread | null> {
+      const thread = await prisma.thread.findUnique({
+          where: {id},
+        });
+    
+        if (!thread) {
+          throw {
+            status: 404,
+            message: "Thread not found!",
+            code: customErrorCode.USERS_NOT_EXIST
+          } as customError
         }
-     })
-      return threads
-    }
+    
+        return await prisma.thread.delete({
+          where: { id},
+        });
+  }
       
 }
 

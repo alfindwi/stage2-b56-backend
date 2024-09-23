@@ -9,8 +9,22 @@ dotenv.config();
 const app : Express = express();
 app.use(express.json());
 const port = process.env.PORT || 4000;
-app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument))
+const cors = require('cors')
+app.use(cors())
 
+if (process.env.NODE_ENV !== "production") {
+    app.use(
+      "/docs",
+      swaggerUI.serve,
+      swaggerUI.setup(swaggerDocument, {
+        explorer: true,
+        swaggerOptions: {
+          persistAuthorization: true,
+          displayRequestDuration: true,
+        },
+      })
+    );
+  } 
 app.get("/", (req, res) => {
     const {accessToken} = req.query
 

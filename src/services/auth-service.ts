@@ -1,5 +1,5 @@
-import { PrismaClient, User } from "@prisma/client"
-import { LoginDTO, RegisterDTO } from "../dto/register-dto"
+import { PrismaClient, User, Thread } from "@prisma/client"
+import { LoginDTO, RegisterDTO } from "../dto/auth-dto"
 import { customError, customErrorCode } from "../types/error"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
@@ -13,7 +13,7 @@ class authService{
 
       const user = await prisma.user.create({data:{
         ...data,
-        passwordUsers: hashedPassword
+        passwordUsers: hashedPassword,
       }})
 
       if (!user) {

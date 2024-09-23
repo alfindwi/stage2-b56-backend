@@ -1,6 +1,6 @@
 import { PrismaClient, Reply, Thread } from "@prisma/client"
 import { customError, customErrorCode } from "../types/error"
-import { ThreadDTO } from "../dto/thread-dto"
+import { CreateThreadDTO } from "../dto/thread-dto"
 import { ReplyDTO } from "../dto/reply-dto"
 
 const prisma = new PrismaClient()

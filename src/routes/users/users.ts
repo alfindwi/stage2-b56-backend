@@ -12,25 +12,30 @@ import suggestionController from "../../contollers/suggestion-controller";
 
 export const routerV1 = express.Router();
 
+
 routerV1.get("/users", userController.find)
 routerV1.get("/users/:id", userController.findById)
 routerV1.get("/users/email/:email", userController.findByEmail)
-routerV1.get("/users/fullname/:fullName", userController.findByFullName)
-routerV1.post("/users", upload.single("image"), uploadFile, userController.create)
-routerV1.patch("/users",  upload.single("image"), uploadFile, userController.update)
+routerV1.post("/users",userController.create)
+routerV1.patch("/users",userController.update)
 routerV1.delete("/users/:id", userController.delete)
 
 routerV1.post("/auth/login", authController.login)
 routerV1.post("/auth/register", authController.register)
-routerV1.post("/auth/check",authentication, authController.check)
+routerV1.get("/auth/check",authentication, authController.check)
 
-routerV1.post("/dashboard",authentication, authorize("ADMIN") ,authController.dashboard)
-
+routerV1.get("/dashboard", authentication, authorize("ADMIN"), (req, res) => {
+    res.json({ message: "Hello from dashboard!" });
+  });
+  
 routerV1.get("/google", authController.googleOAuth)
 routerV1.get("/google/callback", authController.googleOAuthCallback)
 
-routerV1.get("/thread", threadController.findThread)
-routerV1.post("/thread", threadController.post)
+routerV1.get("/thread", threadController.find)
+routerV1.get("/thread/:id", threadController.findById)
+routerV1.post("/thread", threadController.create)
+routerV1.patch("/thread/:id", threadController.update)
+routerV1.delete("/thread/:id", threadController.delete)
 
 routerV1.get("/follow", followController.findFollow)
 routerV1.post("/follow", followController.postFollow)

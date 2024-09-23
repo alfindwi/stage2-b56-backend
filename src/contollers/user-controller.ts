@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import userService from "../services/user-service";
 import { customError, customErrorCode } from "../types/error";
-import { createUserScehma , updateUserScehma} from "../utils/schema/create-users-schema";
+import { createUserScehma , updateUserScehma} from "../utils/schema/users-schema";
 
 class UserController {
     
@@ -10,23 +10,38 @@ class UserController {
             const users = await userService.getAllUsers();
         res.json({data: users});  
         } catch (error) {
-            res.json(error)
+            res.status(500).json(error)
         }
     }
 
-    async findById (req: Request, res: Response) {
+    async findById(req: Request, res: Response) {
         try {
-            const {id} = req.params
-
-        const users = await userService.getUserById(Number(id));
-        res.json({
-            data: users,
-            message: "success search by Id"
-        });  
+            const { id } = req.params;
+    
+            // Validasi ID apakah number atau tidak
+            if (isNaN(Number(id))) {
+                return res.status(400).json({ message: "Invalid user ID" });
+            }
+    
+            // Ambil user berdasarkan ID
+            const user = await userService.getUserById(Number(id));
+    
+            // Jika user tidak ditemukan
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+    
+            // Berhasil menemukan user
+            res.json({
+                data: user,
+                message: "Success search by ID",
+            });
         } catch (error) {
-            res.json(error) 
+            console.error("Error fetching user by ID:", error);
+            res.status(500).json({ message: "Internal server error" });
         }
     }
+    
 
     async findByEmail (req: Request, res: Response) {
         try {
@@ -37,24 +52,12 @@ class UserController {
             message: "success search by Email"
         });
         } catch (error) {
-           res.json(error) 
-        }
-    }
-
-    async findByFullName (req: Request, res: Response) {
-        try {
-            const fullName: string = req.params.fullName;
-        const users = await userService.getUserByfullName(fullName);
-        res.json({
-            data: users,
-            message: "success search by Fullname"
-        });
-        } catch (error) {
-           res.json(error) 
+           res.status(500).json(error)
         }
     }
 
     async create (req: Request, res: Response) {
+        
         try {
             const {error, value} = await createUserScehma.validate(req.body, {abortEarly: false});
 
@@ -66,7 +69,7 @@ class UserController {
             const users = await userService.createUser(value);
             res.json({users});
         } catch (error) {
-            res.json(error)
+            res.status(500).json(error)
         }
     }
 
@@ -82,7 +85,7 @@ class UserController {
             const users = await userService.updateUser(value);
             res.json(users);
           } catch (error) {
-            res.json(error);
+            res.status(500).json(error);
           }
     }
 
@@ -105,7 +108,7 @@ class UserController {
                 message: "success delete user"
             })
         } catch (error) {
-            res.json(error)
+            res.status(500).json(error)
         }
     }
     

@@ -6,6 +6,7 @@ import authService from "../services/auth-service";
 import { GoogleOAuthCallback } from "../types/oauth/google";
 import { loginSchema, registerSchema } from "../utils/schema/auth-schema";
 import jwt from "jsonwebtoken";
+import Cookies from "js-cookie";
 
 
 const prisma = new PrismaClient();
@@ -32,9 +33,9 @@ class AuthController {
             }
 
             const users = await authService.login(value);
-        res.json({data: users});  
+        res.json(users);  
         } catch (error) {
-            res.json(error)
+            res.status(500).json(error)
         }
     }
 
@@ -57,11 +58,11 @@ class AuthController {
                 const errorMessage = error.details.map(detail => detail.message);
                 return res.status(400).json({message: errorMessage})
             }
-
-            const users = await authService.register(value);
-        res.json({data: users});  
+            await authService.register(value);
+            const users = await authService.login(value)
+        res.json(users);  
         } catch (error) {
-            res.json(error)
+            res.status(500).json(error)
         }
     }
 
@@ -70,12 +71,8 @@ class AuthController {
             const user = (req as any).user;
         res.json(user);  
         } catch (error) {
-            res.json(error)
+            res.status(500).json(error)
         }
-    }
-
-    async dashboard (req: Request, res: Response) {
-        res.json({message: "hai dashboard"})
     }
 
     async googleOAuth (req: Request, res: Response) {
